@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 internal class GildedRoseTest {
 
     @Test
-    fun foo() {
+    fun thirty_Iteration_Test() {
 
         // Expected
         val expectedResult = Utils.readFileContentAsString(Utils.THIRTY_ITERATION_LOGS)
