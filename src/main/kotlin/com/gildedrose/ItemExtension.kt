@@ -21,6 +21,9 @@ private fun Item.isDecreasedQualityValid(decrementValue: Int): Boolean {
     return (quality - decrementValue) >= 0
 }
 
+/*
+* Return the value that needs to be increase or decrease based on item type
+* */
 private fun Item.getQualityOperation(currentItemSellIn: Int): Operation {
     return when (name) {
         SULFURAS_HAND_OF_RAGNAROS -> {
@@ -66,8 +69,12 @@ private fun Item.getQualityOperation(currentItemSellIn: Int): Operation {
 typealias SELL_IN = Int
 typealias QUALITY = Int
 
+/*
+* Return the updated value of SellIn & Quality
+* */
 fun Item.updatedValue(): Pair<SELL_IN, QUALITY> {
     with(this) {
+        // Reducing SellIn day for all items other than SULFURAS_HAND_OF_RAGNAROS
         val sell = if (name == SULFURAS_HAND_OF_RAGNAROS) {
             0
         } else {
@@ -77,6 +84,8 @@ fun Item.updatedValue(): Pair<SELL_IN, QUALITY> {
 
         val operation = getQualityOperation(currentItemSellIn)
 
+        // Validating if after incrementing or decrementing quality value,
+        // quality will match the given criteria else returning old quality
         val currentItemQuality = when (operation) {
             is Operation.Increase -> {
                 if (isIncreasedQualityValid(operation.count)) {
