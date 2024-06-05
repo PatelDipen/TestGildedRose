@@ -8,20 +8,20 @@ const val BACKSTAGE_PASSES_TO_A_TAFKAL80ETC_CONCERT = "Backstage passes to a TAF
 const val CONJURED_MANA_CAKE = "Conjured Mana Cake"
 
 sealed class Operation {
-    data class Increase(val number: Int) : Operation()
-    data class Decrease(val number: Int) : Operation()
+    data class Increase(val count: Int) : Operation()
+    data class Decrease(val count: Int) : Operation()
     data object None : Operation()
 }
 
-private fun Item.isIncreasedQuantityValid(incrementValue: Int): Boolean {
+private fun Item.isIncreasedQualityValid(incrementValue: Int): Boolean {
     return (quality + incrementValue) <= 50
 }
 
-private fun Item.isDecreasedQuantityValid(decrementValue: Int): Boolean {
+private fun Item.isDecreasedQualityValid(decrementValue: Int): Boolean {
     return (quality - decrementValue) >= 0
 }
 
-private fun Item.getQuantityOperation(currentItemSellIn: Int): Operation {
+private fun Item.getQualityOperation(currentItemSellIn: Int): Operation {
     return when (name) {
         SULFURAS_HAND_OF_RAGNAROS -> {
             Operation.None
@@ -35,11 +35,11 @@ private fun Item.getQuantityOperation(currentItemSellIn: Int): Operation {
         BACKSTAGE_PASSES_TO_A_TAFKAL80ETC_CONCERT -> {
             if (currentItemSellIn < 0) {
                 Operation.Decrease(quality)
-            } else if (currentItemSellIn < 5 && isIncreasedQuantityValid(3)) { // TODO need to clarify if <= is required here
+            } else if (currentItemSellIn < 5 && isIncreasedQualityValid(3)) { // TODO need to clarify if <= is required here
                 Operation.Increase(3)
-            } else if (currentItemSellIn < 10 && isIncreasedQuantityValid(2)) { // TODO need to clarify if <= is required here
+            } else if (currentItemSellIn < 10 && isIncreasedQualityValid(2)) { // TODO need to clarify if <= is required here
                 Operation.Increase(2)
-            } else if (isIncreasedQuantityValid(1)) {
+            } else if (isIncreasedQualityValid(1)) {
                 Operation.Increase(1)
             } else {
                 Operation.Increase(0)
@@ -63,10 +63,10 @@ private fun Item.getQuantityOperation(currentItemSellIn: Int): Operation {
     }
 }
 
-typealias SELLIN = Int
+typealias SELL_IN = Int
 typealias QUALITY = Int
 
-fun Item.updatedValue(): Pair<SELLIN, QUALITY> {
+fun Item.updatedValue(): Pair<SELL_IN, QUALITY> {
     with(this) {
         val sell = if (name == SULFURAS_HAND_OF_RAGNAROS) {
             0
@@ -75,20 +75,20 @@ fun Item.updatedValue(): Pair<SELLIN, QUALITY> {
         }
         val currentItemSellIn = sellIn + sell
 
-        val operation = getQuantityOperation(currentItemSellIn)
+        val operation = getQualityOperation(currentItemSellIn)
 
         val currentItemQuality = when (operation) {
             is Operation.Increase -> {
-                if (isIncreasedQuantityValid(operation.number)) {
-                    quality + operation.number
+                if (isIncreasedQualityValid(operation.count)) {
+                    quality + operation.count
                 } else {
                     quality
                 }
             }
 
             is Operation.Decrease -> {
-                if (isDecreasedQuantityValid(operation.number)) {
-                    quality - operation.number
+                if (isDecreasedQualityValid(operation.count)) {
+                    quality - operation.count
                 } else {
                     quality
                 }
